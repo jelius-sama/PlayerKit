@@ -8,33 +8,33 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var selection: SidebarItem = .home
     @StateObject private var fullscreen = FullscreenController()
 
     var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "play.rectangle.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(.tint)
+        HStack(spacing: 0) {
+            SidebarView(selection: $selection)
+                .frame(width: 220) // 🔒 Fixed, non-resizable
+                .background(.ultraThinMaterial)
 
-            Text("PlayerKit")
-                .font(.largeTitle)
-                .bold()
+            Divider()
 
-            Button("Toggle Fullscreen") {
-                fullscreen.toggle()
+            Group {
+                switch selection {
+                case .home:
+                    HomeView()
+                        .environmentObject(fullscreen)
+                case .settings:
+                    Text("Settings")
+                }
             }
-            .keyboardShortcut("f", modifiers: [.command])
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .padding()
+        .frame(minWidth: 900, minHeight: 600)
         .background(
             WindowAccessor { window in
                 fullscreen.attach(window: window)
             }
         )
-        .frame(minWidth: 600, minHeight: 400)
     }
-}
-
-#Preview {
-    ContentView()
 }

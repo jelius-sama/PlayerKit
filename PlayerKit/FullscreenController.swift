@@ -14,6 +14,8 @@ final class FullscreenController: ObservableObject {
     private var originalStyle: NSWindow.StyleMask = []
     private var isFullscreen = false
     
+    private var escapeKeyMonitor: Any?
+    
     @objc private func handleGreenButton() {
         toggle()
     }
@@ -30,10 +32,12 @@ final class FullscreenController: ObservableObject {
     func attach(window: NSWindow) {
         self.window = window
 
+        window.titlebarAppearsTransparent = true
         window.collectionBehavior = [.managed]
         window.styleMask.remove(.fullScreen)
 
         hookGreenButton()
+        installEscapeKeyHandler()
     }
 
     func toggle() {
@@ -50,6 +54,56 @@ final class FullscreenController: ObservableObject {
         }
     }
 
+    private func partialEnter() {
+        guard let window = self.window,
+              let screen = window.screen else { return }
+
+        originalFrame = window.frame
+
+        // KEEP titled style for toolbar & sidebar
+        window.styleMask.insert(.titled)
+
+        // Hide titlebar visually
+        window.titleVisibility = .hidden
+        window.titlebarAppearsTransparent = true
+        window.toolbarStyle = .unified
+
+        // Disable resizing feel
+        window.styleMask.remove(.resizable)
+        window.hasShadow = false
+        window.level = .mainMenu
+
+        NSApp.presentationOptions = [.hideMenuBar, .hideDock]
+
+        animate {
+            window.animator().setFrame(screen.frame, display: true)
+        }
+    }
+
+    private func partialExit() {
+        guard let window = self.window,
+              let frame = originalFrame else { return }
+
+        window.level = .normal
+        NSApp.presentationOptions = []
+
+        animate {
+            window.animator().setFrame(frame, display: true)
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            guard let window = self.window else { return }
+
+            window.titleVisibility = .visible
+            window.titlebarAppearsTransparent = false
+            window.toolbarStyle = .automatic
+            window.styleMask.insert(.resizable)
+            window.hasShadow = true
+
+            self.hookGreenButton()
+        }
+    }
+    
     private func enter() {
         guard let window else { return }
 
@@ -90,8 +144,31 @@ final class FullscreenController: ObservableObject {
             window.styleMask.insert([.titled, .closable, .miniaturizable, .resizable])
             window.hasShadow = true
 
-            // 🔑 Re-hook green button (from previous fix)
+            // Re-hook green button
             self.hookGreenButton()
+        }
+    }
+
+    private func installEscapeKeyHandler() {
+        guard escapeKeyMonitor == nil else { return }
+
+        escapeKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self else { return event }
+
+            // ESC key
+            if event.keyCode == 53, self.isFullscreen {
+                self.exit()
+                self.isFullscreen = false
+                return nil // consume event
+            }
+
+            return event
+        }
+    }
+
+    deinit {
+        if let monitor = escapeKeyMonitor {
+            NSEvent.removeMonitor(monitor)
         }
     }
 }
