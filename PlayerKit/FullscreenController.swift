@@ -53,56 +53,6 @@ final class FullscreenController: ObservableObject {
             changes()
         }
     }
-
-    private func partialEnter() {
-        guard let window = self.window,
-              let screen = window.screen else { return }
-
-        originalFrame = window.frame
-
-        // KEEP titled style for toolbar & sidebar
-        window.styleMask.insert(.titled)
-
-        // Hide titlebar visually
-        window.titleVisibility = .hidden
-        window.titlebarAppearsTransparent = true
-        window.toolbarStyle = .unified
-
-        // Disable resizing feel
-        window.styleMask.remove(.resizable)
-        window.hasShadow = false
-        window.level = .mainMenu
-
-        NSApp.presentationOptions = [.hideMenuBar, .hideDock]
-
-        animate {
-            window.animator().setFrame(screen.frame, display: true)
-        }
-    }
-
-    private func partialExit() {
-        guard let window = self.window,
-              let frame = originalFrame else { return }
-
-        window.level = .normal
-        NSApp.presentationOptions = []
-
-        animate {
-            window.animator().setFrame(frame, display: true)
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-            guard let window = self.window else { return }
-
-            window.titleVisibility = .visible
-            window.titlebarAppearsTransparent = false
-            window.toolbarStyle = .automatic
-            window.styleMask.insert(.resizable)
-            window.hasShadow = true
-
-            self.hookGreenButton()
-        }
-    }
     
     private func enter() {
         guard let window else { return }
@@ -136,6 +86,7 @@ final class FullscreenController: ObservableObject {
         // Animate back to original frame
         animate {
             window.animator().setFrame(frame, display: true)
+            window.styleMask = self.originalStyle
         }
 
         // Restore chrome AFTER animation completes
