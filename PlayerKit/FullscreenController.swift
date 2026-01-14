@@ -14,13 +14,13 @@ final class FullscreenController: ObservableObject {
     private var originalStyle: NSWindow.StyleMask = []
     private var isFullscreen = false
     private var titleObserver = WindowTitleObserver()
-    
+
     private var escapeKeyMonitor: Any?
-    
+
     @objc private func handleGreenButton() {
         toggle()
     }
-    
+
     private func hookGreenButton() {
         guard let window else { return }
 
@@ -47,16 +47,18 @@ final class FullscreenController: ObservableObject {
         isFullscreen ? exit() : enter()
         isFullscreen.toggle()
     }
-    
-    private func animate(_ duration: TimeInterval = 0.25,
-                         _ changes: @escaping () -> Void) {
+
+    private func animate(
+        _ duration: TimeInterval = 0.25,
+        _ changes: @escaping () -> Void
+    ) {
         NSAnimationContext.runAnimationGroup { context in
             context.duration = duration
             context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
             changes()
         }
     }
-    
+
     private func enter() {
         guard let window else { return }
 
@@ -81,7 +83,8 @@ final class FullscreenController: ObservableObject {
 
     private func exit() {
         guard let window,
-              let frame = originalFrame else { return }
+            let frame = originalFrame
+        else { return }
 
         window.level = .normal
         NSApp.presentationOptions = []
@@ -106,14 +109,15 @@ final class FullscreenController: ObservableObject {
     private func installEscapeKeyHandler() {
         guard escapeKeyMonitor == nil else { return }
 
-        escapeKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+        escapeKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) {
+            [weak self] event in
             guard let self else { return event }
 
             // ESC key
             if event.keyCode == 53, self.isFullscreen {
                 self.exit()
                 self.isFullscreen = false
-                return nil // consume event
+                return nil  // consume event
             }
 
             return event
@@ -131,11 +135,11 @@ final class FullscreenController: ObservableObject {
 class WindowTitleObserver: NSObject, ObservableObject {
     private var observation: NSKeyValueObservation?
     private weak var window: NSWindow?
-    
+
     func observe(window: NSWindow) {
         self.window = window
         window.titleVisibility = .hidden
-        
+
         // Observe changes to titleVisibility
         observation = window.observe(\.titleVisibility, options: [.new]) { window, change in
             if window.titleVisibility != .hidden {
@@ -143,7 +147,7 @@ class WindowTitleObserver: NSObject, ObservableObject {
             }
         }
     }
-    
+
     deinit {
         observation?.invalidate()
     }

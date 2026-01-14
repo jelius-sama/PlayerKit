@@ -12,7 +12,7 @@ struct ContentView: View {
     @State private var selection: SidebarItem? = .home
     @StateObject private var fullscreen = FullscreenController()
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
-    
+
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
             SidebarView(selection: $selection)
