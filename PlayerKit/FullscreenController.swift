@@ -13,6 +13,7 @@ final class FullscreenController: ObservableObject {
     private var originalFrame: NSRect?
     private var originalStyle: NSWindow.StyleMask = []
     private var isFullscreen = false
+    private var titleObserver = WindowTitleObserver()
     
     private var escapeKeyMonitor: Any?
     
@@ -32,6 +33,8 @@ final class FullscreenController: ObservableObject {
     func attach(window: NSWindow) {
         self.window = window
 
+        titleObserver.observe(window: window)
+        window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
         window.collectionBehavior = [.managed]
         window.styleMask.remove(.fullScreen)
@@ -121,5 +124,27 @@ final class FullscreenController: ObservableObject {
         if let monitor = escapeKeyMonitor {
             NSEvent.removeMonitor(monitor)
         }
+    }
+}
+
+// Observer class to watch title visibility changes
+class WindowTitleObserver: NSObject, ObservableObject {
+    private var observation: NSKeyValueObservation?
+    private weak var window: NSWindow?
+    
+    func observe(window: NSWindow) {
+        self.window = window
+        window.titleVisibility = .hidden
+        
+        // Observe changes to titleVisibility
+        observation = window.observe(\.titleVisibility, options: [.new]) { window, change in
+            if window.titleVisibility != .hidden {
+                window.titleVisibility = .hidden
+            }
+        }
+    }
+    
+    deinit {
+        observation?.invalidate()
     }
 }
