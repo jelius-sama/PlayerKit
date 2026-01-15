@@ -10,8 +10,76 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject private var fullscreen: FullscreenController
+    @StateObject private var viewModel = DirectoryViewModel()
 
     var body: some View {
+        VStack(spacing: 0) {
+            // Toolbar
+            HStack(spacing: 12) {
+                if viewModel.canNavigateBack() {
+                    Button {
+                        viewModel.navigateBack()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                    }
+                    .buttonStyle(.borderless)
+                    .help("Back")
+                }
+
+                if viewModel.currentDirectory != nil {
+                    Button {
+                        viewModel.navigateToHome()
+                    } label: {
+                        Image(systemName: "house")
+                    }
+                    .buttonStyle(.borderless)
+                    .help("Home")
+                }
+
+                Text(viewModel.getCurrentDirectoryName())
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+
+                Spacer()
+
+                if viewModel.isScanning {
+                    ProgressView()
+                        .scaleEffect(0.7)
+                        .frame(width: 20, height: 20)
+                }
+
+                Button {
+                    openFolderPicker()
+                } label: {
+                    Label("Add Folder", systemImage: "folder.badge.plus")
+                }
+                .keyboardShortcut("o", modifiers: [.command])
+            }
+            .padding()
+            .background(Color(nsColor: .windowBackgroundColor))
+
+            Divider()
+
+            // Main content
+            if viewModel.currentDirectory == nil {
+                homeView
+            } else {
+                browserView
+            }
+        }
+    }
+
+    private var homeView: some View {
+        Group {
+            if viewModel.savedDirectories.isEmpty {
+                emptyStateView
+            } else {
+                savedDirectoriesView
+            }
+        }
+    }
+
+    private var emptyStateView: some View {
         VStack(spacing: 24) {
             Image(systemName: "film.stack")
                 .font(.system(size: 64))
@@ -36,6 +104,59 @@ struct HomeView: View {
         .padding()
     }
 
+    private var savedDirectoriesView: some View {
+        ScrollView {
+            LazyVGrid(
+                columns: [
+                    GridItem(.adaptive(minimum: 180, maximum: 250), spacing: 16)
+                ],
+                spacing: 16
+            ) {
+                ForEach(viewModel.savedDirectories) { directory in
+                    DirectoryCard(directory: directory)
+                        .onTapGesture {
+                            viewModel.navigateToSavedDirectory(directory)
+                        }
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                viewModel.removeDirectory(directory)
+                            } label: {
+                                Label("Remove", systemImage: "trash")
+                            }
+                        }
+                }
+            }
+            .padding()
+        }
+    }
+
+    private var browserView: some View {
+        Group {
+            if viewModel.items.isEmpty && !viewModel.isScanning {
+                VStack(spacing: 16) {
+                    Image(systemName: "film.stack")
+                        .font(.system(size: 48))
+                        .foregroundStyle(.secondary)
+                    Text("No video files found in this folder")
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 1) {
+                        ForEach(viewModel.items) { item in
+                            BrowsableItemRow(item: item)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    viewModel.openItem(item)
+                                }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private func openFolderPicker() {
         guard let window = NSApp.keyWindow else { return }
 
@@ -44,12 +165,11 @@ struct HomeView: View {
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = false
+        panel.prompt = "Add Folder"
 
-        // Present as a sheet attached to the window
         panel.beginSheetModal(for: window) { response in
             if response == .OK, let url = panel.url {
-                print("Selected folder path:")
-                print(url.path)
+                viewModel.addDirectory(url: url)
             }
         }
     }

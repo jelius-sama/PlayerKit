@@ -10,9 +10,22 @@
 		C46DF8922F178D260042F127 /* PlayerKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlayerKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		C49BFDE02F18DA4E00046E6A /* Exceptions for "PlayerKit" folder in "Copy Bundle Resources" phase from "PlayerKit" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = C46DF8902F178D260042F127 /* Resources */;
+			membershipExceptions = (
+				PlayerKit.entitlements,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C46DF8942F178D260042F127 /* PlayerKit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C49BFDE02F18DA4E00046E6A /* Exceptions for "PlayerKit" folder in "Copy Bundle Resources" phase from "PlayerKit" target */,
+			);
 			path = PlayerKit;
 			sourceTree = "<group>";
 		};
