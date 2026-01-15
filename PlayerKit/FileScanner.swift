@@ -1,3 +1,10 @@
+//
+//  FileScanner.swift
+//  PlayerKit
+//
+//  Created by Jelius Basumatary on 15/01/26.
+//
+
 import Foundation
 
 class FileScanner {
