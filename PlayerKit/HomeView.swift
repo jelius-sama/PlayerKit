@@ -68,11 +68,12 @@ struct HomeView: View {
             }
         }
         .sheet(item: Binding(
-        get: { viewModel.selectedVideo.map { VideoSheetItem(url: $0) } },
-        set: { viewModel.selectedVideo = $0?.url }
-    )) { item in
-        VideoPlayerView(videoURL: item.url)
-    }
+            get: { viewModel.selectedVideo.map { VideoSheetItem(url: $0) } },
+            set: { viewModel.selectedVideo = $0?.url }
+        )) { item in
+            VideoPlayerView(videoURL: item.url)
+                .frame(minWidth: 1280, minHeight: 720)
+        }
     }
 
     private var homeView: some View {

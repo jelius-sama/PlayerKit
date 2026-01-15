@@ -12,8 +12,10 @@ struct VideoPlayerView: View {
     let videoURL: URL
     @Environment(\.dismiss) private var dismiss
     @StateObject private var playerManager = VideoPlayerManager()
+    @StateObject private var fullscreenController = FullscreenController()
     @State private var showControls = true
     @State private var controlsTimer: Timer?
+    @State private var window: NSWindow?
     
     var body: some View {
         ZStack {
@@ -27,6 +29,9 @@ struct VideoPlayerView: View {
                 }
                 .onDisappear {
                     playerManager.stop()
+                    if fullscreenController.isInFullscreen {
+                        fullscreenController.toggle()
+                    }
                 }
             
             // Controls overlay
@@ -52,12 +57,22 @@ struct VideoPlayerView: View {
                 resetControlsTimer()
             }
         }
+        .background(
+            WindowAccessor { window in
+                self.window = window
+                fullscreenController.attach(window: window)
+            }
+        )
         .preferredColorScheme(.dark)
+        .frame(minWidth: 1280, minHeight: 720)
     }
     
     private var topBar: some View {
         HStack {
             Button {
+                if fullscreenController.isInFullscreen {
+                    fullscreenController.toggle()
+                }
                 dismiss()
             } label: {
                 Image(systemName: "xmark")
@@ -68,6 +83,7 @@ struct VideoPlayerView: View {
             .buttonStyle(.plain)
             .background(Color.black.opacity(0.5))
             .clipShape(Circle())
+            .keyboardShortcut(.escape, modifiers: [])
             
             Spacer()
             
@@ -79,9 +95,9 @@ struct VideoPlayerView: View {
             Spacer()
             
             Button {
-                playerManager.toggleFullscreen()
+                fullscreenController.toggle()
             } label: {
-                Image(systemName: playerManager.isFullscreen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
+                Image(systemName: fullscreenController.isInFullscreen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
                     .font(.title2)
                     .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
@@ -89,6 +105,7 @@ struct VideoPlayerView: View {
             .buttonStyle(.plain)
             .background(Color.black.opacity(0.5))
             .clipShape(Circle())
+            .keyboardShortcut("f", modifiers: [])
         }
         .padding()
         .background(
@@ -123,6 +140,7 @@ struct VideoPlayerView: View {
                         .frame(width: 44, height: 44)
                 }
                 .buttonStyle(.plain)
+                .keyboardShortcut(.space, modifiers: [])
                 
                 // Skip backward
                 Button {
@@ -133,6 +151,7 @@ struct VideoPlayerView: View {
                         .foregroundStyle(.white)
                 }
                 .buttonStyle(.plain)
+                .keyboardShortcut(.leftArrow, modifiers: [])
                 
                 // Skip forward
                 Button {
@@ -143,6 +162,7 @@ struct VideoPlayerView: View {
                         .foregroundStyle(.white)
                 }
                 .buttonStyle(.plain)
+                .keyboardShortcut(.rightArrow, modifiers: [])
                 
                 Spacer()
                 
@@ -163,6 +183,9 @@ struct VideoPlayerView: View {
                     Slider(value: $playerManager.volume, in: 0...1)
                         .frame(width: 100)
                         .tint(.white)
+                        .onChange(of: playerManager.volume) { _, newValue in
+                            playerManager.setVolume(newValue)
+                        }
                 }
             }
             .padding(.horizontal)

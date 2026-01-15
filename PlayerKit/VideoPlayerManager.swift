@@ -15,7 +15,6 @@ class VideoPlayerManager: NSObject, ObservableObject {
     @Published var duration: TimeInterval = 0
     @Published var volume: Float = 0.7
     @Published var isMuted = false
-    @Published var isFullscreen = false
     
     private(set) var player: VLCMediaPlayer?
     private var timer: Timer?
@@ -73,9 +72,9 @@ class VideoPlayerManager: NSObject, ObservableObject {
         player?.audio?.isMuted = isMuted
     }
     
-    func toggleFullscreen() {
-        isFullscreen.toggle()
-        // This will be handled by the parent view
+    func setVolume(_ newVolume: Float) {
+        volume = newVolume
+        player?.audio?.volume = Int32(newVolume * 100)
     }
     
     func stop() {

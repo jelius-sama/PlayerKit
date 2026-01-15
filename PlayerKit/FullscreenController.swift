@@ -14,6 +14,8 @@ final class FullscreenController: ObservableObject {
     private var originalStyle: NSWindow.StyleMask = []
     private var isFullscreen = false
     private var titleObserver = WindowTitleObserver()
+    
+    @Published var isInFullscreen = false
 
     private var escapeKeyMonitor: Any?
 
@@ -46,6 +48,7 @@ final class FullscreenController: ObservableObject {
     func toggle() {
         isFullscreen ? exit() : enter()
         isFullscreen.toggle()
+        isInFullscreen = isFullscreen
     }
 
     private func animate(
