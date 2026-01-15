@@ -67,6 +67,12 @@ struct HomeView: View {
                 browserView
             }
         }
+        .sheet(item: Binding(
+        get: { viewModel.selectedVideo.map { VideoSheetItem(url: $0) } },
+        set: { viewModel.selectedVideo = $0?.url }
+    )) { item in
+        VideoPlayerView(videoURL: item.url)
+    }
     }
 
     private var homeView: some View {
@@ -173,4 +179,9 @@ struct HomeView: View {
             }
         }
     }
+}
+
+struct VideoSheetItem: Identifiable {
+    let id = UUID()
+    let url: URL
 }

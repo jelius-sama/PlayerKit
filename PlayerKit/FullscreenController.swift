@@ -132,6 +132,18 @@ final class FullscreenController: ObservableObject {
 }
 
 // Observer class to watch title visibility changes
+//
+// We do this because when a sidebar is present, the default sidebar toggle
+// button is placed in the title bar alongside the traffic-light controls.
+// In fullscreen mode this button becomes neither visible nor clickable,
+// so it is better to remove it entirely. Doing so also means the sidebar
+// must be non-resizable (i.e. fixed/static).
+//
+// However, when the sidebar button is hidden, the space reserved for it
+// is not reclaimed by the layout system. As a result, the window title
+// ends up in an awkward position — neither centered nor aligned with the
+// traffic lights, but somewhere in between. To avoid this visual glitch,
+// we disable the title entirely.
 class WindowTitleObserver: NSObject, ObservableObject {
     private var observation: NSKeyValueObservation?
     private weak var window: NSWindow?

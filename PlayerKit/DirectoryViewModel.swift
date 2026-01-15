@@ -14,6 +14,7 @@ class DirectoryViewModel: ObservableObject {
     @Published var navigationStack: [URL] = []
     @Published var items: [BrowsableItem] = []
     @Published var isScanning = false
+    @Published var selectedVideo: URL?
 
     private var currentAccessedURL: URL?
 
@@ -123,7 +124,8 @@ class DirectoryViewModel: ObservableObject {
         if item.isDirectory {
             navigateToDirectory(item.url)
         } else if item.isVideo {
-            print("TODO: Implement video player for: \(item.url.path)")
+            // print("TODO: Implement video player for: \(item.url.path)")
+            selectedVideo = item.url
         }
     }
 

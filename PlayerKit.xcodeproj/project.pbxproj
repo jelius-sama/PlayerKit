@@ -6,16 +6,32 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXCopyFilesBuildPhase section */
+		C481B4D72F193755005979EF /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		C46DF8922F178D260042F127 /* PlayerKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlayerKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		C49BFDE02F18DA4E00046E6A /* Exceptions for "PlayerKit" folder in "Copy Bundle Resources" phase from "PlayerKit" target */ = {
+		C481B4D82F193755005979EF /* Exceptions for "PlayerKit" folder in "Embed Frameworks" phase from "PlayerKit" target */ = {
 			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = C46DF8902F178D260042F127 /* Resources */;
+			attributesByRelativePath = {
+				VLCKit.framework = (CodeSignOnCopy, RemoveHeadersOnCopy, );
+			};
+			buildPhase = C481B4D72F193755005979EF /* Embed Frameworks */;
 			membershipExceptions = (
-				PlayerKit.entitlements,
+				VLCKit.framework,
 			);
 		};
 /* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
@@ -24,7 +40,7 @@
 		C46DF8942F178D260042F127 /* PlayerKit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				C49BFDE02F18DA4E00046E6A /* Exceptions for "PlayerKit" folder in "Copy Bundle Resources" phase from "PlayerKit" target */,
+				C481B4D82F193755005979EF /* Exceptions for "PlayerKit" folder in "Embed Frameworks" phase from "PlayerKit" target */,
 			);
 			path = PlayerKit;
 			sourceTree = "<group>";
@@ -68,6 +84,7 @@
 				C46DF88E2F178D260042F127 /* Sources */,
 				C46DF88F2F178D260042F127 /* Frameworks */,
 				C46DF8902F178D260042F127 /* Resources */,
+				C481B4D72F193755005979EF /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -267,6 +284,10 @@
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/PlayerKit",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -297,6 +318,10 @@
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/PlayerKit",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
