@@ -67,12 +67,11 @@ struct HomeView: View {
                 browserView
             }
         }
-        .sheet(item: Binding(
-            get: { viewModel.selectedVideo.map { VideoSheetItem(url: $0) } },
-            set: { viewModel.selectedVideo = $0?.url }
-        )) { item in
-            VideoPlayerView(videoURL: item.url)
-                .frame(minWidth: 1280, minHeight: 720)
+        .onChange(of: viewModel.selectedVideo) { _, newVideo in
+            if let videoURL = newVideo {
+                openVideoPlayerWindow(videoURL: videoURL)
+                viewModel.selectedVideo = nil  // Reset immediately
+            }
         }
     }
 
@@ -180,9 +179,19 @@ struct HomeView: View {
             }
         }
     }
-}
 
-struct VideoSheetItem: Identifiable {
-    let id = UUID()
-    let url: URL
+    private func openVideoPlayerWindow(videoURL: URL) {
+        let playerView = VideoPlayerView(videoURL: videoURL)
+        let hostingController = NSHostingController(rootView: playerView)
+
+        let window = NSWindow(contentViewController: hostingController)
+        window.title = videoURL.lastPathComponent
+        window.setContentSize(NSSize(width: 1280, height: 720))
+        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+        window.center()
+        window.makeKeyAndOrderFront(nil)
+
+        // Keep a strong reference to prevent deallocation
+        WindowManager.shared.registerWindow(window)
+    }
 }

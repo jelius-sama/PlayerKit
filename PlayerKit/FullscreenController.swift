@@ -14,7 +14,7 @@ final class FullscreenController: ObservableObject {
     private var originalStyle: NSWindow.StyleMask = []
     private var isFullscreen = false
     private var titleObserver = WindowTitleObserver()
-    
+
     @Published var isInFullscreen = false
 
     private var escapeKeyMonitor: Any?
@@ -70,17 +70,18 @@ final class FullscreenController: ObservableObject {
 
         guard let screen = window.screen else { return }
 
-        // Prepare window state BEFORE animation
-        window.styleMask.remove([.titled, .closable, .miniaturizable, .resizable])
-        window.styleMask.insert(.borderless)
+        // Remove all window chrome BEFORE animation
+        window.styleMask = [.borderless, .fullSizeContentView]
         window.hasShadow = false
         window.level = .mainMenu
+        window.isOpaque = true
+        window.backgroundColor = .black
 
-        NSApp.presentationOptions = [.hideMenuBar, .hideDock]
+        NSApp.presentationOptions = [.hideMenuBar, .hideDock, .autoHideToolbar]
 
-        // Animate frame change
+        // Animate frame change to cover entire screen
         animate {
-            window.animator().setFrame(screen.frame, display: true)
+            window.animator().setFrame(screen.frame, display: true, animate: true)
         }
     }
 
@@ -94,15 +95,14 @@ final class FullscreenController: ObservableObject {
 
         // Animate back to original frame
         animate {
-            window.animator().setFrame(frame, display: true)
-            window.styleMask = self.originalStyle
+            window.animator().setFrame(frame, display: true, animate: true)
         }
 
         // Restore chrome AFTER animation completes
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-            window.styleMask.remove(.borderless)
-            window.styleMask.insert([.titled, .closable, .miniaturizable, .resizable])
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            window.styleMask = self.originalStyle
             window.hasShadow = true
+            window.backgroundColor = .windowBackgroundColor
 
             // Re-hook green button
             self.hookGreenButton()

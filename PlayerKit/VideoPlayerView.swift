@@ -5,23 +5,23 @@
 //  Created by Jelius Basumatary on 15/01/26.
 //
 
-import SwiftUI
 import AVKit
+import SwiftUI
 
 struct VideoPlayerView: View {
     let videoURL: URL
-    @Environment(\.dismiss) private var dismiss
+    // @Environment(\.dismiss) private var dismiss
     @StateObject private var playerManager = VideoPlayerManager()
     @StateObject private var fullscreenController = FullscreenController()
     @State private var showControls = true
     @State private var controlsTimer: Timer?
     @State private var window: NSWindow?
-    
+
     var body: some View {
         ZStack {
             Color.black
                 .ignoresSafeArea()
-            
+
             // Video content
             VLCPlayerView(playerManager: playerManager)
                 .onAppear {
@@ -33,15 +33,15 @@ struct VideoPlayerView: View {
                         fullscreenController.toggle()
                     }
                 }
-            
+
             // Controls overlay
             if showControls {
                 VStack {
                     // Top bar
                     topBar
-                    
+
                     Spacer()
-                    
+
                     // Bottom controls
                     bottomControls
                 }
@@ -66,14 +66,15 @@ struct VideoPlayerView: View {
         .preferredColorScheme(.dark)
         .frame(minWidth: 1280, minHeight: 720)
     }
-    
+
     private var topBar: some View {
         HStack {
             Button {
                 if fullscreenController.isInFullscreen {
                     fullscreenController.toggle()
                 }
-                dismiss()
+                // Change this line:
+                window?.close()
             } label: {
                 Image(systemName: "xmark")
                     .font(.title2)
@@ -81,30 +82,30 @@ struct VideoPlayerView: View {
                     .frame(width: 44, height: 44)
             }
             .buttonStyle(.plain)
-            .background(Color.black.opacity(0.5))
-            .clipShape(Circle())
             .keyboardShortcut(.escape, modifiers: [])
-            
+
             Spacer()
-            
+
             Text(videoURL.lastPathComponent)
                 .font(.headline)
                 .foregroundStyle(.white)
                 .lineLimit(1)
-            
+
             Spacer()
-            
+
             Button {
                 fullscreenController.toggle()
             } label: {
-                Image(systemName: fullscreenController.isInFullscreen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
-                    .font(.title2)
-                    .foregroundStyle(.white)
-                    .frame(width: 44, height: 44)
+                Image(
+                    systemName: fullscreenController.isInFullscreen
+                        ? "arrow.down.right.and.arrow.up.left"
+                        : "arrow.up.left.and.arrow.down.right"
+                )
+                .font(.title2)
+                .foregroundStyle(.white)
+                .frame(width: 44, height: 44)
             }
             .buttonStyle(.plain)
-            .background(Color.black.opacity(0.5))
-            .clipShape(Circle())
             .keyboardShortcut("f", modifiers: [])
         }
         .padding()
@@ -116,7 +117,7 @@ struct VideoPlayerView: View {
             )
         )
     }
-    
+
     private var bottomControls: some View {
         VStack(spacing: 12) {
             // Progress bar
@@ -127,7 +128,7 @@ struct VideoPlayerView: View {
                     playerManager.seek(to: time)
                 }
             )
-            
+
             // Playback controls
             HStack(spacing: 24) {
                 // Play/Pause
@@ -141,7 +142,7 @@ struct VideoPlayerView: View {
                 }
                 .buttonStyle(.plain)
                 .keyboardShortcut(.space, modifiers: [])
-                
+
                 // Skip backward
                 Button {
                     playerManager.skip(seconds: -10)
@@ -152,7 +153,7 @@ struct VideoPlayerView: View {
                 }
                 .buttonStyle(.plain)
                 .keyboardShortcut(.leftArrow, modifiers: [])
-                
+
                 // Skip forward
                 Button {
                     playerManager.skip(seconds: 10)
@@ -163,23 +164,26 @@ struct VideoPlayerView: View {
                 }
                 .buttonStyle(.plain)
                 .keyboardShortcut(.rightArrow, modifiers: [])
-                
+
                 Spacer()
-                
+
                 // Time display
                 Text(playerManager.timeDisplay)
                     .font(.caption)
                     .foregroundStyle(.white)
                     .monospacedDigit()
-                
+
                 // Volume control
                 HStack(spacing: 8) {
-                    Image(systemName: playerManager.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                        .foregroundStyle(.white)
-                        .onTapGesture {
-                            playerManager.toggleMute()
-                        }
-                    
+                    Image(
+                        systemName: playerManager.isMuted
+                            ? "speaker.slash.fill" : "speaker.wave.2.fill"
+                    )
+                    .foregroundStyle(.white)
+                    .onTapGesture {
+                        playerManager.toggleMute()
+                    }
+
                     Slider(value: $playerManager.volume, in: 0...1)
                         .frame(width: 100)
                         .tint(.white)
@@ -199,7 +203,7 @@ struct VideoPlayerView: View {
             )
         )
     }
-    
+
     private func toggleControls() {
         withAnimation(.easeInOut(duration: 0.2)) {
             showControls.toggle()
@@ -208,7 +212,7 @@ struct VideoPlayerView: View {
             resetControlsTimer()
         }
     }
-    
+
     private func resetControlsTimer() {
         controlsTimer?.invalidate()
         controlsTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { _ in
