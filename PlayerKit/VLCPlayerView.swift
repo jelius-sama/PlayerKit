@@ -24,9 +24,16 @@ struct VLCPlayerView: NSViewRepresentable {
     }
     
     func updateNSView(_ nsView: VLCVideoView, context: Context) {
-        // No updates needed
+        // Explicitly do nothing - we don't want to recreate the player
+    }
+    
+    static func == (lhs: VLCPlayerView, rhs: VLCPlayerView) -> Bool {
+        // Always return true to prevent re-rendering
+        return true
     }
 }
+
+extension VLCPlayerView: Equatable {}
 
 class VLCVideoView: NSView {
     override init(frame frameRect: NSRect) {

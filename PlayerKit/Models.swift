@@ -59,20 +59,24 @@ struct VideoFile: Identifiable, Equatable {
     }
 }
 
-struct BrowsableItem: Identifiable, Equatable {
+struct BrowsableItem: Identifiable, Equatable, Hashable {
     let id = UUID()
     let url: URL
     let name: String
     let isDirectory: Bool
     let isVideo: Bool
     let size: Int64?
-
+    
     var displaySize: String? {
         guard let size = size else { return nil }
         return ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
     }
-
+    
     static func == (lhs: BrowsableItem, rhs: BrowsableItem) -> Bool {
         lhs.url == rhs.url
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(url)
     }
 }

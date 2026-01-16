@@ -15,6 +15,12 @@ class DirectoryViewModel: ObservableObject {
     @Published var items: [BrowsableItem] = []
     @Published var isScanning = false
     @Published var selectedVideo: URL?
+    @Published var navigationDirection: NavigationDirection = .forward
+
+    enum NavigationDirection {
+        case forward
+        case backward
+    }
 
     private var currentAccessedURL: URL?
 
@@ -62,22 +68,23 @@ class DirectoryViewModel: ObservableObject {
 
     func navigateToSavedDirectory(_ directory: SavedDirectory) {
         print("Attempting to navigate to saved directory: \(directory.path)")
-
+        
         guard let url = directory.resolveURL() else {
             print("Could not resolve URL for directory")
             return
         }
-
+        
         // Stop accessing previous URL if any
         if let previousURL = currentAccessedURL {
             previousURL.stopAccessingSecurityScopedResource()
             print("Stopped accessing: \(previousURL.path)")
         }
-
+        
         // Start accessing security-scoped resource
         if url.startAccessingSecurityScopedResource() {
             print("Successfully started accessing: \(url.path)")
             currentAccessedURL = url
+            navigationDirection = .forward
             navigateToDirectory(url)
         } else {
             print("Failed to start accessing: \(url.path)")
@@ -86,10 +93,11 @@ class DirectoryViewModel: ObservableObject {
 
     func navigateToDirectory(_ url: URL) {
         print("Navigating to: \(url.path)")
-
+        
         if currentDirectory != url {
             navigationStack.append(url)
         }
+        navigationDirection = .forward
         currentDirectory = url
         scanCurrentDirectory()
     }
@@ -100,6 +108,7 @@ class DirectoryViewModel: ObservableObject {
             return
         }
 
+        navigationDirection = .backward
         navigationStack.removeLast()
         if let previousDir = navigationStack.last {
             currentDirectory = previousDir
@@ -114,7 +123,8 @@ class DirectoryViewModel: ObservableObject {
             print("Stopped accessing: \(accessedURL.path)")
             currentAccessedURL = nil
         }
-
+        
+        navigationDirection = .backward
         navigationStack.removeAll()
         currentDirectory = nil
         items = []
@@ -122,11 +132,15 @@ class DirectoryViewModel: ObservableObject {
 
     func openItem(_ item: BrowsableItem) {
         if item.isDirectory {
+            navigationDirection = .forward
             navigateToDirectory(item.url)
         } else if item.isVideo {
-            // print("TODO: Implement video player for: \(item.url.path)")
             selectedVideo = item.url
         }
+    }
+
+    func closeVideoPlayer() {
+        selectedVideo = nil
     }
 
     private func scanCurrentDirectory() {

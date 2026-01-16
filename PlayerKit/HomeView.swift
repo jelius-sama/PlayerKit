@@ -10,15 +10,53 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject private var fullscreen: FullscreenController
+    @EnvironmentObject private var sidebar: SidebarController
     @StateObject private var viewModel = DirectoryViewModel()
+    @State private var showVideoPlayer = false
 
     var body: some View {
+        ZStack {
+            if !showVideoPlayer {
+                browserContent
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .leading).combined(with: .opacity),
+                        removal: .move(edge: .leading).combined(with: .opacity)
+                    ))
+            }
+            
+            if showVideoPlayer, let videoURL = viewModel.selectedVideo {
+                VideoPlayerPageView(videoURL: videoURL) {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        showVideoPlayer = false
+                    }
+                    viewModel.closeVideoPlayer()
+                }
+                .environmentObject(fullscreen)
+                .environmentObject(sidebar)
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal: .move(edge: .trailing).combined(with: .opacity)
+                ))
+            }
+        }
+        .onChange(of: viewModel.selectedVideo) { _, newVideo in
+            if newVideo != nil {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    showVideoPlayer = true
+                }
+            }
+        }
+    }
+    
+    private var browserContent: some View {
         VStack(spacing: 0) {
             // Toolbar
             HStack(spacing: 12) {
                 if viewModel.canNavigateBack() {
                     Button {
-                        viewModel.navigateBack()
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            viewModel.navigateBack()
+                        }
                     } label: {
                         Image(systemName: "chevron.left")
                     }
@@ -28,7 +66,9 @@ struct HomeView: View {
 
                 if viewModel.currentDirectory != nil {
                     Button {
-                        viewModel.navigateToHome()
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            viewModel.navigateToHome()
+                        }
                     } label: {
                         Image(systemName: "house")
                     }
@@ -60,18 +100,38 @@ struct HomeView: View {
 
             Divider()
 
-            // Main content
-            if viewModel.currentDirectory == nil {
-                homeView
-            } else {
-                browserView
+            // Main content with animation
+            ZStack {
+                if viewModel.currentDirectory == nil {
+                    homeView
+                        .transition(viewModel.navigationDirection == .forward ?
+                            .asymmetric(
+                                insertion: .move(edge: .leading).combined(with: .opacity),
+                                removal: .move(edge: .leading).combined(with: .opacity)
+                            ) :
+                            .asymmetric(
+                                insertion: .move(edge: .trailing).combined(with: .opacity),
+                                removal: .move(edge: .trailing).combined(with: .opacity)
+                            )
+                        )
+                        .id("home")
+                } else {
+                    browserView
+                        .transition(viewModel.navigationDirection == .forward ?
+                            .asymmetric(
+                                insertion: .move(edge: .trailing).combined(with: .opacity),
+                                removal: .move(edge: .trailing).combined(with: .opacity)
+                            ) :
+                            .asymmetric(
+                                insertion: .move(edge: .leading).combined(with: .opacity),
+                                removal: .move(edge: .leading).combined(with: .opacity)
+                            )
+                        )
+                        .id(viewModel.currentDirectory?.path ?? "browser")
+                }
             }
-        }
-        .onChange(of: viewModel.selectedVideo) { _, newVideo in
-            if let videoURL = newVideo {
-                openVideoPlayerWindow(videoURL: videoURL)
-                viewModel.selectedVideo = nil  // Reset immediately
-            }
+            .animation(.easeInOut(duration: 0.25), value: viewModel.currentDirectory)
+            .animation(.easeInOut(duration: 0.25), value: viewModel.navigationDirection)
         }
     }
 
@@ -121,7 +181,9 @@ struct HomeView: View {
                 ForEach(viewModel.savedDirectories) { directory in
                     DirectoryCard(directory: directory)
                         .onTapGesture {
-                            viewModel.navigateToSavedDirectory(directory)
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                viewModel.navigateToSavedDirectory(directory)
+                            }
                         }
                         .contextMenu {
                             Button(role: .destructive) {
@@ -178,20 +240,5 @@ struct HomeView: View {
                 viewModel.addDirectory(url: url)
             }
         }
-    }
-
-    private func openVideoPlayerWindow(videoURL: URL) {
-        let playerView = VideoPlayerView(videoURL: videoURL)
-        let hostingController = NSHostingController(rootView: playerView)
-
-        let window = NSWindow(contentViewController: hostingController)
-        window.title = videoURL.lastPathComponent
-        window.setContentSize(NSSize(width: 1280, height: 720))
-        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
-        window.center()
-        window.makeKeyAndOrderFront(nil)
-
-        // Keep a strong reference to prevent deallocation
-        WindowManager.shared.registerWindow(window)
     }
 }
