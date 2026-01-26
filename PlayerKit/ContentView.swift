@@ -5,61 +5,52 @@
 //  Created by Jelius Basumatary on 14/01/26.
 //
 
-import SwiftUI
+import AppKit
 import Combine
+import SwiftUI
+import SwiftUIIntrospect
 
-@MainActor
-final class SidebarController: ObservableObject {
-    @Published var columnVisibility: NavigationSplitViewVisibility = .all
-
-    private var allowNextClose = false
-
-    func closeSidebar() {
-        allowNextClose = true
-        columnVisibility = .detailOnly
-    }
-
-    func openSidebar() {
-        columnVisibility = .all
-    }
-
-    func toggleSidebar() {
-        if columnVisibility == .detailOnly {
-            openSidebar()
-        } else {
-            closeSidebar()
-        }
-    }
-
-    /// Used by ContentView to decide whether to “reopen” after a user drag collapse.
-    func consumeAllowNextClose() -> Bool {
-        defer { allowNextClose = false }
-        return allowNextClose
-    }
+enum SidebarTab: String, CaseIterable, Hashable, Identifiable {
+    case home, settings
+    var id: String { self.rawValue }
+    var title: String { self.rawValue.capitalized }
+    var icon: String { self == .home ? "house.fill" : "gearshape.fill" }
 }
 
-// TODO: Make the sidebar not collapsible by dragging.
 struct ContentView: View {
-    @State private var selection: SidebarItem? = .home
+    @State private var selectedTab: SidebarTab = .home
+    @State private var columnVisibility = NavigationSplitViewVisibility.all
+    @State private var searchText = ""
+    @State private var sortOption = "Date"
     @StateObject private var fullscreen = FullscreenController()
-    @StateObject private var sidebar = SidebarController()
 
     var body: some View {
-        NavigationSplitView(columnVisibility: $sidebar.columnVisibility) {
-            SidebarView(selection: $selection)
-                .navigationSplitViewColumnWidth(min: 250, ideal: 250, max: 250)
+        NavigationSplitView(columnVisibility: $columnVisibility) {
+            List(SidebarTab.allCases, selection: $selectedTab) { tab in
+                Label(tab.title, systemImage: tab.icon).tag(tab)
+            }
+            .toolbar(removing: .sidebarToggle)  // Prevents manual hide
+            .navigationSplitViewColumnWidth(200)
         } detail: {
-            switch selection {
-            case .home:
-                HomeView()
-                    .environmentObject(fullscreen)
-                    .environmentObject(sidebar)
-            case .settings:
-                Text("Settings")
-                    .environmentObject(sidebar)
-            case .none:
-                Text("Select an item")
-                    .environmentObject(sidebar)
+            NavigationStack {
+                Group {
+                    switch selectedTab {
+                    case .home:
+                        HomeView()
+                            .environmentObject(fullscreen)
+                    case .settings:
+                        SettingsView()
+                            .environmentObject(fullscreen)
+                    }
+                }
+            }
+        }
+        .introspect(.navigationSplitView, on: .macOS(.v13, .v14, .v15, .v26)) { splitView in
+            if let splitViewController = splitView.delegate as? NSSplitViewController {
+                if let sidebarItem = splitViewController.splitViewItems.first {
+                    sidebarItem.canCollapse = false  // Disables drag-to-hide
+                    sidebarItem.canCollapseFromWindowResize = false
+                }
             }
         }
         .frame(minWidth: 900, minHeight: 600)
@@ -68,15 +59,5 @@ struct ContentView: View {
                 fullscreen.attach(window: window)
             }
         )
-        .navigationSplitViewStyle(.balanced)
-        .toolbar(.hidden)
-        .onChange(of: sidebar.columnVisibility) { _, newValue in
-            guard newValue == .detailOnly else { return }
-
-            // If it wasn’t closed via `closeSidebar()`, reopen it.
-            if !sidebar.consumeAllowNextClose() {
-                sidebar.columnVisibility = .all
-            }
-        }
     }
 }

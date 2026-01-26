@@ -5,8 +5,8 @@
 //  Created by Jelius Basumatary on 14/01/26.
 //
 
-import SwiftUI
 import AppKit
+import SwiftUI
 
 struct WindowAccessor: NSViewRepresentable {
     let callback: (NSWindow) -> Void

@@ -14,6 +14,7 @@ final class FullscreenController: ObservableObject {
     private var originalStyle: NSWindow.StyleMask = []
     private var isFullscreen = false
     private var titleObserver = WindowTitleObserver()
+    let defaultBackgroundColor = NSColor.windowBackgroundColor
 
     @Published var isInFullscreen = false
 
@@ -74,8 +75,7 @@ final class FullscreenController: ObservableObject {
         window.styleMask = [.borderless, .fullSizeContentView]
         window.hasShadow = false
         window.level = .mainMenu
-        window.isOpaque = true
-        window.backgroundColor = .black
+        window.backgroundColor = defaultBackgroundColor
 
         NSApp.presentationOptions = [.hideMenuBar, .hideDock, .autoHideToolbar]
 
@@ -91,6 +91,7 @@ final class FullscreenController: ObservableObject {
         else { return }
 
         window.level = .normal
+        window.backgroundColor = defaultBackgroundColor
         NSApp.presentationOptions = []
 
         // Animate back to original frame
@@ -102,7 +103,6 @@ final class FullscreenController: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             window.styleMask = self.originalStyle
             window.hasShadow = true
-            window.backgroundColor = .windowBackgroundColor
 
             // Re-hook green button
             self.hookGreenButton()

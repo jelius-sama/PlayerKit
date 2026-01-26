@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C49B6F712F2760D80016F4FB /* SwiftUIIntrospect-Static in Frameworks */ = {isa = PBXBuildFile; productRef = C49B6F702F2760D80016F4FB /* SwiftUIIntrospect-Static */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		C481B4D72F193755005979EF /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C49B6F712F2760D80016F4FB /* SwiftUIIntrospect-Static in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,6 +100,7 @@
 			);
 			name = PlayerKit;
 			packageProductDependencies = (
+				C49B6F702F2760D80016F4FB /* SwiftUIIntrospect-Static */,
 			);
 			productName = PlayerKit;
 			productReference = C46DF8922F178D260042F127 /* PlayerKit.app */;
@@ -124,6 +130,9 @@
 			);
 			mainGroup = C46DF8892F178D260042F127;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C49B6F6F2F2760D80016F4FB /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C46DF8932F178D260042F127 /* Products */;
 			projectDirPath = "";
@@ -363,6 +372,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C49B6F6F2F2760D80016F4FB /* XCRemoteSwiftPackageReference "swiftui-introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/swiftui-introspect";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 26.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C49B6F702F2760D80016F4FB /* SwiftUIIntrospect-Static */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C49B6F6F2F2760D80016F4FB /* XCRemoteSwiftPackageReference "swiftui-introspect" */;
+			productName = "SwiftUIIntrospect-Static";
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C46DF88A2F178D260042F127 /* Project object */;
 }

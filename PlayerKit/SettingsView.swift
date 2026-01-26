@@ -1,5 +1,5 @@
 //
-//  HomeView.swift
+//  SettingsView.swift
 //  PlayerKit
 //
 //  Created by Jelius Basumatary on 26/01/26.
@@ -7,18 +7,18 @@
 
 import SwiftUI
 
-struct HomeView: View {
+struct SettingsView: View {
     @EnvironmentObject private var fullscreen: FullscreenController
 
     var body: some View {
         VStack {
-            Image(systemName: "house").font(.system(size: 40)).padding()
+            Image(systemName: "gearshape").font(.system(size: 40)).padding()
             NavigationLink(
-                "Go to Sub-Page",
-                destination: (Text("This is a Home Sub-Page"))
+                "Open Profile Settings",
+                destination: (Text("This is a Settings Sub-Page"))
                     .toolbar(.hidden)
             )
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.bordered)
         }
     }
 }
