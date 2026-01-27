@@ -148,8 +148,7 @@ final class FullscreenController: ObservableObject {
 
             // ESC key
             if event.keyCode == 53, self.isFullscreen {
-                self.exit()
-                self.isFullscreen = false
+                self.toggle()
                 return nil  // consume event
             }
 

@@ -40,24 +40,17 @@ struct ContentView: View {
             .toolbar(removing: .sidebarToggle)  // We don't want the sidebar to be closed.
             .navigationSplitViewColumnWidth(200)
         } detail: {
-            // TODO: Implement a custom navigation stack so we can control routing
-            //       more explicitly, instead of relying on the default navigation stack.
-            //       The default navigation stack places its buttons in the title bar,
-            //       next to the traffic light buttons. These buttons become hidden when we
-            //       enter our custom full screen mode. Because of this, we need to
-            //       implement our own navigation stack and position it slightly lower.
-            NavigationStack {
-                Group {
-                    switch selectedTab {
-                    case .home:
-                        HomeView()
-                            .environmentObject(fullscreen)
-                    case .settings:
-                        SettingsView()
-                            .environmentObject(fullscreen)
-                    }
+            PlayerKitNavigationStack(sidebarTab: selectedTab) {
+                switch selectedTab {
+                case .home:
+                    HomeView()
+                        .environmentObject(fullscreen)
+                case .settings:
+                    SettingsView()
+                        .environmentObject(fullscreen)
                 }
             }
+            .environmentObject(fullscreen)
         }
         // Since SwiftUI doesn't provide a built-in solution to stop sidebar from ever collapsing
         // we go raw and deep inside to fix it.

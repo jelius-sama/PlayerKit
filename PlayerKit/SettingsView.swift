@@ -12,17 +12,26 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @EnvironmentObject private var router: PlayerKitNavigationRouter
     @EnvironmentObject private var fullscreen: FullscreenController
 
     var body: some View {
-        VStack {
-            Image(systemName: "gearshape").font(.system(size: 40)).padding()
-            NavigationLink(
-                "Open Profile Settings",
-                destination: (Text("This is a Settings Sub-Page"))
-                    .toolbar(.hidden)
-            )
+        VStack(spacing: 20) {
+            Image(systemName: "gearshape").font(.system(size: 40))
+
+            Button("Open Profile Settings") {
+                router.push(ProfileView())
+            }
             .buttonStyle(.bordered)
         }
+        .padding()
+    }
+}
+
+struct ProfileView: View {
+    var body: some View {
+        Text("This is a Profile Page")
+            .font(.title)
+            .padding()
     }
 }

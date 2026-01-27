@@ -12,17 +12,27 @@
 import SwiftUI
 
 struct HomeView: View {
+    @EnvironmentObject private var router: PlayerKitNavigationRouter
     @EnvironmentObject private var fullscreen: FullscreenController
 
     var body: some View {
-        VStack {
-            Image(systemName: "house").font(.system(size: 40)).padding()
-            NavigationLink(
-                "Go to Sub-Page",
-                destination: (Text("This is a Home Sub-Page"))
-                    .toolbar(.hidden)
-            )
+        VStack(spacing: 20) {
+            Image(systemName: "house")
+                .font(.system(size: 40))
+
+            Button("Go to Sub-Page") {
+                router.push(HomeSubView())
+            }
             .buttonStyle(.borderedProminent)
         }
+        .padding()
+    }
+}
+
+struct HomeSubView: View {
+    var body: some View {
+        Text("This is a Home Sub-Page")
+            .font(.title)
+            .padding()
     }
 }
