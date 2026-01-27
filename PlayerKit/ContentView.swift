@@ -68,6 +68,7 @@ struct ContentView: View {
             // we have implemented a custom full screen handler and here we attach it to
             // the main app window (patches the green button in the traffic lights).
             WindowAccessor { window in
+                enableAcceptFirstMouse(on: window)
                 fullscreen.attach(window: window)
             }
         )
