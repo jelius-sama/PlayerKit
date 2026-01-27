@@ -20,7 +20,7 @@ struct SettingsView: View {
             Image(systemName: "gearshape").font(.system(size: 40))
 
             Button("Open Profile Settings") {
-                router.push(ProfileView())
+                router.push(ProfileView().environmentObject(router))
             }
             .buttonStyle(.bordered)
         }
@@ -29,8 +29,26 @@ struct SettingsView: View {
 }
 
 struct ProfileView: View {
+    @EnvironmentObject private var router: PlayerKitNavigationRouter
+
     var body: some View {
-        Text("This is a Profile Page")
+        VStack(spacing: 20) {
+            Text("This is a Profile Page")
+                .font(.title)
+                .padding()
+
+            Button("Open Profile Settings") {
+                router.push(ProfileView2())
+            }
+            .buttonStyle(.bordered)
+        }
+        .padding()
+    }
+}
+
+struct ProfileView2: View {
+    var body: some View {
+        Text("RAW and DEEP")
             .font(.title)
             .padding()
     }

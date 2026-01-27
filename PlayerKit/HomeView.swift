@@ -12,27 +12,70 @@
 import SwiftUI
 
 struct HomeView: View {
-    @EnvironmentObject private var router: PlayerKitNavigationRouter
-    @EnvironmentObject private var fullscreen: FullscreenController
+    @State private var directories: [LibraryDirectory] = []
 
     var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "house")
-                .font(.system(size: 40))
-
-            Button("Go to Sub-Page") {
-                router.push(HomeSubView())
+        Group {
+            if directories.isEmpty {
+                Button("Add Directory") {
+                    pickDirectories { urls in
+                        importDirectories(urls: urls)
+                        reload()
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+            } else {
+                DirectoryGridView(directories: directories)
             }
-            .buttonStyle(.borderedProminent)
         }
-        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .onAppear {
+            reload()
+        }
     }
-}
 
-struct HomeSubView: View {
-    var body: some View {
-        Text("This is a Home Sub-Page")
-            .font(.title)
-            .padding()
+    private func reload() {
+        directories = Database.shared.fetchDirectories()
+    }
+
+    private func pickDirectories(
+        completion: @escaping ([URL]) -> Void
+    ) {
+        DispatchQueue.main.async {
+            let panel = NSOpenPanel()
+            panel.title = "Select Directory"
+            panel.prompt = "Add"
+            panel.canChooseFiles = false
+            panel.canChooseDirectories = true
+            panel.allowsMultipleSelection = true
+            panel.resolvesAliases = true
+
+            panel.begin { response in
+                if response == .OK {
+                    completion(panel.urls)
+                } else {
+                    completion([])
+                }
+            }
+        }
+    }
+
+    private func importDirectories(urls: [URL]) {
+        for url in urls {
+            guard url.hasDirectoryPath else { continue }
+
+            do {
+                let bookmark = try BookmarkManager.createBookmark(for: url)
+
+                Database.shared.insertDirectory(
+                    path: url.path,
+                    bookmark: bookmark
+                )
+            } catch {
+                // Ignore failed directories for now
+                // Later we can surface errors to UI
+                continue
+            }
+        }
     }
 }

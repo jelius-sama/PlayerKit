@@ -12,11 +12,18 @@
 import Combine
 import SwiftUI
 
+struct NavigationItem: Identifiable {
+    let id = UUID()
+    let view: AnyView
+}
+
 final class PlayerKitNavigationRouter: ObservableObject {
-    @Published private(set) var stack: [AnyView] = []
+    @Published private(set) var stack: [NavigationItem] = []
 
     func push<V: View>(_ view: V) {
-        stack.append(AnyView(view))
+        stack.append(
+            NavigationItem(view: AnyView(view))
+        )
     }
 
     func pop() {
@@ -54,7 +61,7 @@ struct PlayerKitNavigationStack<Root: View>: View {
 
             ZStack(alignment: .top) {
                 if let top = router.stack.last {
-                    top
+                    top.view.id(top.id)
                 } else {
                     root
                 }
