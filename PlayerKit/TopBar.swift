@@ -30,21 +30,22 @@ struct TopBar: View {
 
             Spacer()
 
-            Button {
-                fullscreen.toggle()
-            } label: {
-                Image(
-                    systemName: fullscreen.isInFullscreen
-                        ? "arrow.down.right.and.arrow.up.left"
-                        : "arrow.up.left.and.arrow.down.right"
-                )
-                .padding(6)
+            if fullscreen.isInFullscreen {
+                Button {
+                    fullscreen.toggle()
+                } label: {
+                    Image(
+                        systemName: fullscreen.isInFullscreen
+                            ? "arrow.down.right.and.arrow.up.left"
+                            : "arrow.up.left.and.arrow.down.right"
+                    )
+                    .padding(6)
+                }
+                .buttonStyle(.glass)
+                .clipShape(Circle())
             }
-            .buttonStyle(.glass)
-            .clipShape(Circle())
         }
         .padding(.horizontal)
-        .frame(height: 44)
-        .background(.ultraThinMaterial)
+        .frame(height: fullscreen.isInFullscreen ? 44 * 2 : 44)
     }
 }
