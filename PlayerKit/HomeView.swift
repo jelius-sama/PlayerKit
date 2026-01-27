@@ -38,6 +38,10 @@ struct HomeView: View {
         directories = Database.shared.fetchDirectories()
     }
 
+    // BUG: Doesn't work in fullscreen BTW, fix it later, shouldn't be that hard.
+    //      When I say doesn't work I mean that the file picker is rendered below
+    //      the main application window thereby making interaction with the picker
+    //      not possible, since it works in windowed mode, this bug is fine for now.
     private func pickDirectories(
         completion: @escaping ([URL]) -> Void
     ) {
