@@ -1,8 +1,12 @@
+// SPDX-License-Identifier: See LICENSE
 //
-//  HomeView.swift
-//  PlayerKit
+// ContentView.swift
+// PlayerKit
 //
-//  Created by Jelius Basumatary on 26/01/26.
+// Copyright (c) 2026 Jelius <personal@jelius.dev>
+//
+// This file is part of PlayerKit.
+// See the LICENSE file in the project root for license information.
 //
 
 import SwiftUI

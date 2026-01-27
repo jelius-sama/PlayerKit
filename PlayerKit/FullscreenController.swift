@@ -1,8 +1,12 @@
+// SPDX-License-Identifier: See LICENSE
 //
-//  FullscreenController.swift
-//  PlayerKit
+// ContentView.swift
+// PlayerKit
 //
-//  Created by Jelius Basumatary on 14/01/26.
+// Copyright (c) 2026 Jelius <personal@jelius.dev>
+//
+// This file is part of PlayerKit.
+// See the LICENSE file in the project root for license information.
 //
 
 import AppKit
@@ -24,6 +28,9 @@ final class FullscreenController: ObservableObject {
         toggle()
     }
 
+    // SwiftUI's declarative nature re-creates the traffic light
+    // buttons when re-rendering the window so we may have to
+    // re-hook for the green button to function as expected again.
     private func hookGreenButton() {
         guard let window else { return }
 
@@ -33,6 +40,13 @@ final class FullscreenController: ObservableObject {
         }
     }
 
+    // In future if we create a new window (other than the main window)
+    // make sure to attach this to the window if the window is allowed
+    // to go full screen otherwise it is not needed to do so.
+    // It basically sets up the custom full screen for that window.
+    // I'm also not sure if SwiftUI already inherits this function
+    // from the parent window but in such case we don't need to
+    // attach this to each window we create.
     func attach(window: NSWindow) {
         self.window = window
 
@@ -52,6 +66,9 @@ final class FullscreenController: ObservableObject {
         isInFullscreen = isFullscreen
     }
 
+    // When we enter our custom full screen mode the act of
+    // going full screen doesn't animate at all therefore
+    // we have to implement it ourself explicitly.
     private func animate(
         _ duration: TimeInterval = 0.25,
         _ changes: @escaping () -> Void
@@ -63,6 +80,12 @@ final class FullscreenController: ObservableObject {
         }
     }
 
+    // Hack to make the window feel like it entered full screen.
+    // Not sure why we call it a hack because it is an actual
+    // full screen if we look at it from Linux/Windows point of
+    // view.
+    // Who creates a new space when entering full screen anyways,
+    // it is terrible UX just follow the industry standard Tim-Apple.
     private func enter() {
         guard let window else { return }
 
@@ -104,11 +127,18 @@ final class FullscreenController: ObservableObject {
             window.styleMask = self.originalStyle
             window.hasShadow = true
 
+            // SwiftUI's re-creates the title bar
             // Re-hook green button
             self.hookGreenButton()
         }
     }
 
+    // There's no title bar when we are in full screen mode
+    // I'm not sure how good of an UX it is but pressing ESC
+    // exits full screen mode. Some may not know that we use
+    // ESC for this purpose, maybe we should add some indication
+    // or a dedicated button in our to-be-implemented navigation
+    // bar utilizing our custom navigation stack.
     private func installEscapeKeyHandler() {
         guard escapeKeyMonitor == nil else { return }
 
