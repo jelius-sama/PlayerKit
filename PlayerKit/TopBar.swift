@@ -22,14 +22,11 @@ struct TopBar: View {
                     router.pop()
                 } label: {
                     Image(systemName: "chevron.left")
+                        .padding(6)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.glass)
+                .clipShape(Circle())
             }
-
-            Spacer()
-
-            Text("PlayerKit")
-                .font(.headline)
 
             Spacer()
 
@@ -39,9 +36,12 @@ struct TopBar: View {
                 Image(
                     systemName: fullscreen.isInFullscreen
                         ? "arrow.down.right.and.arrow.up.left"
-                        : "arrow.up.left.and.arrow.down.right")
+                        : "arrow.up.left.and.arrow.down.right"
+                )
+                .padding(6)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.glass)
+            .clipShape(Circle())
         }
         .padding(.horizontal)
         .frame(height: 44)

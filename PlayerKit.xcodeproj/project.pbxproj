@@ -27,25 +27,9 @@
 		C46DF8922F178D260042F127 /* PlayerKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlayerKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		C481B4D82F193755005979EF /* Exceptions for "PlayerKit" folder in "Embed Frameworks" phase from "PlayerKit" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			attributesByRelativePath = {
-				VLCKit.framework = (CodeSignOnCopy, RemoveHeadersOnCopy, );
-			};
-			buildPhase = C481B4D72F193755005979EF /* Embed Frameworks */;
-			membershipExceptions = (
-				VLCKit.framework,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C46DF8942F178D260042F127 /* PlayerKit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				C481B4D82F193755005979EF /* Exceptions for "PlayerKit" folder in "Embed Frameworks" phase from "PlayerKit" target */,
-			);
 			path = PlayerKit;
 			sourceTree = "<group>";
 		};
