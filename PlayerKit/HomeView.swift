@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: See LICENSE
 //
-// ContentView.swift
+// HomeView.swift
 // PlayerKit
 //
 // Copyright (c) 2026 Jelius <personal@jelius.dev>
